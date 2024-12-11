@@ -3,14 +3,14 @@
 ## Problem Statement
 **Determining expert relevance with respect to interview board subject and candidates' area of expertise.**
 
-![Problem Statement Image](./path-to-uploaded-image.png)
+![Problem Statement Image](Problem Statement.png)
 
 ## How to Run the Project
 
 1. **Clone the Repository**:
    ```bash
    git clone https://github.com/Wilfred2668/Smart-India-Hackathon-p2.git
-   cd your-repo-link
+   cd Smart-India-Hackathon-p2
    ```
 
 2. **Install Dependencies**:
