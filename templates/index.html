@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Interview Panel Selection</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #666;
+            margin: 10px 0;
+        }
+        input[type="file"],
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #output {
+            margin-top: 30px;
+            text-align: left;
+        }
+        #outputMessage {
+            font-size: 16px;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        td {
+            background-color: #f9f9f9;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            button {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Find Suitable Interview Panel</h1>
+        <form id="uploadForm">
+            <p>Upload the Excel file with <strong>'Candidates'</strong> and <strong>'Professors'</strong> sheets:</p>
+            <input type="file" id="fileInput" name="file" accept=".xlsx" required>
+
+            <p>Enter the candidate's name:</p>
+            <input type="text" id="nameInput" name="candidate_name" placeholder="Enter candidate name" required>
+
+            <p>Enter the number of panel members required:</p>
+            <input type="number" id="panelCountInput" name="panel_count" min="1" max="10" placeholder="Enter number of members" required>
+
+            <button type="submit">Find Interview Panel</button>
+        </form>
+
+        <div id="output">
+            <p id="outputMessage"></p>
+            <table id="resultTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Professor</th>
+                        <th>Relevance Score</th>
+                        <th>Years of Experience</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Results will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData();
+            const fileInput = document.getElementById('fileInput');
+            const nameInput = document.getElementById('nameInput');
+            const panelCountInput = document.getElementById('panelCountInput');
+
+            formData.append('file', fileInput.files[0]);
+            formData.append('candidate_name', nameInput.value);
+            formData.append('panel_count', panelCountInput.value);
+
+            fetch('/get_interviewers', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const outputMessage = document.getElementById('outputMessage');
+                const resultTable = document.getElementById('resultTable');
+                const tbody = resultTable.querySelector('tbody');
+
+                if (data.error) {
+                    outputMessage.textContent = data.error;
+                    resultTable.style.display = 'none';
+                } else {
+                    outputMessage.textContent = `Top ${panelCountInput.value} Professors for ${nameInput.value}`;
+                    resultTable.style.display = 'table';
+                    tbody.innerHTML = '';
+
+                    data.forEach(professor => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${professor.Professor}</td>
+                            <td>${professor['Relevance Score'].toFixed(2)}</td>
+                            <td>${professor['Years of Experience'] || 'N/A'}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('outputMessage').textContent = 'An error occurred while processing the request.';
+            });
+        });
+    </script>
+</body>
+</html>
