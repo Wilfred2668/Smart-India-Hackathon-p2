@@ -3,7 +3,7 @@
 ## Problem Statement
 **Determining expert relevance with respect to interview board subject and candidates' area of expertise.**
 
-![Problem Statement Image](Problem Statement.png)
+![Problem Statement Image](https://github.com/Wilfred2668/Smart-India-Hackathon-p2/blob/main/Problem%20Statement.png)
 
 ## How to Run the Project
 
